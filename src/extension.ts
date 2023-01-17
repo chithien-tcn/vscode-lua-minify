@@ -178,7 +178,7 @@ function getText(selection: boolean = false): string | undefined {
 async function getFolder() {
 	// let workSpaceFolder: readonly vscode.WorkspaceFolder[] | undefined = vscode.workspace.workspaceFolders
 	// workSpaceFolder?.map(folder => folder.uri.path).filter(fs ->);
-	const files = await vscode.workspace.findFiles('**/*.lua');
+	const files = await vscode.workspace.findFiles('**/*.lua', "**/{reload,a_hide,form_auto_task_new.lua,form_auto_task_round.lua}");
 	files.map((file) => {
 		console.log(file.fsPath);
 		const fileContent = fs.readFileSync(file.fsPath, 'utf8');
