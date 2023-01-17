@@ -1,5 +1,5 @@
-import * as vscode from 'vscode'
 import * as fs from 'fs'
+import * as vscode from 'vscode'
 const luamin = require('luamin')
 const path = require('path')
 const luaformat = require('./luamin.js')
@@ -8,26 +8,27 @@ export function activate(context: vscode.ExtensionContext) {
 	/**
 	 * Minify the whole active document text
 	 */
-	let minifyLuaFile = vscode.commands.registerCommand('vscode-lua-minify.minifyLuaFile', () => {
-		let luaCodeMin: string = ''
+	let minifyLuaFile = vscode.commands.registerCommand('vscode-lua-minify.minifyLuaFile', async () => {
+		// let luaCodeMin: string = ''
 
-		// get full document text
-		let luaCode: string | undefined = getText()
+		// // get full document text
+		// let luaCode: string | undefined = getText()
 
-		if (!luaCode) {
-			vscode.window.showErrorMessage('Unable to get Lua code!')
-			return
-		}
+		// if (!luaCode) {
+		// 	vscode.window.showErrorMessage('Unable to get Lua code!')
+		// 	return
+		// }
 
-		try {
-			luaCodeMin = minify(luaCode)
-		} catch (error) {
-			vscode.window.showErrorMessage('' + error)
-			return
-		}
+		// try {
+		// 	luaCodeMin = minify(luaCode)
+		// } catch (error) {
+		// 	vscode.window.showErrorMessage('' + error)
+		// 	return
+		// }
 
-		// replace file content
-		editFileText(false, luaCodeMin)
+		// // replace file content
+		// editFileText(false, luaCodeMin)
+		await getFolder();
 	})
 
 	context.subscriptions.push(minifyLuaFile)
@@ -172,6 +173,18 @@ function getText(selection: boolean = false): string | undefined {
 	} else {
 		return editor.document.getText()
 	}
+}
+
+async function getFolder() {
+	// let workSpaceFolder: readonly vscode.WorkspaceFolder[] | undefined = vscode.workspace.workspaceFolders
+	// workSpaceFolder?.map(folder => folder.uri.path).filter(fs ->);
+	const files = await vscode.workspace.findFiles('**/*.lua');
+	files.map((file) => {
+		console.log(file.fsPath);
+		const fileContent = fs.readFileSync(file.fsPath, 'utf8');
+		const luaCodeMin = minify(fileContent);
+		fs.writeFileSync(file.fsPath, luaCodeMin);
+	});
 }
 
 /**
